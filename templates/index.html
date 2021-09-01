@@ -39,15 +39,15 @@
                         <p>Anh</p>
                     </div>
                     <div class="text-left-bottom">
-                        <textarea name="english" id="english" col=" 2" row="10" maxlength="360" autofocus
+                        <textarea name="entext" id="english" col=" 2" row="10" maxlength="360" autofocus
                             placeholder="Nhập văn bản">{{en_input}}</textarea>
 
                     </div>
                     <div class="text-english-bottom">
                         <div class="media">
-                            <img src="{% static 'img/microphone.png' %}" alt="" />
+                            <img src="{% static 'img/microphone.png' %}" alt="" id="micro" onclick="record()" />
 
-                            <img src="{% static 'img/volume.png' %}" alt="" />
+                            <img src="{% static 'img/volume.png' %}" alt="" id="volume" />
 
                         </div>
                         <div id="count">
@@ -80,6 +80,21 @@
             </div>
         </div>
     </div>
+    <script>
+        function record() {
+            var recognition = new webkitSpeechRecognition();
+            recognition.lang = "en-GB";
+
+            recognition.onresult = function (event) {
+                // console.log(event);
+
+                document.getElementById('english').value = event.results[0][0].transcript;
+                console.log(document.getElementById('english').value)
+            }
+            recognition.start();
+
+        }
+    </script>
 </body>
 
 </html>

@@ -12,6 +12,8 @@ $(document).ready(function () {
         $(".trans").removeClass("activate");
         $($(".trans")[index]).addClass("activate");
     });
+
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== "") {
@@ -28,7 +30,7 @@ $(document).ready(function () {
             }
         }
         return cookieValue;
-    }
+    };
     $('textarea').keyup(function () {
         var characterCount = $(this).val().length,
             current_count = $('#current_count'),
