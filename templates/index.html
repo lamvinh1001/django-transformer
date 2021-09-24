@@ -39,6 +39,7 @@
                         <p>Anh</p>
                     </div>
                     <div class="text-left-bottom">
+                        {% csrf_token %}
                         <textarea name="entext" id="english" col=" 2" row="10" maxlength="360" autofocus
                             placeholder="Nhập văn bản">{{en_input}}</textarea>
 

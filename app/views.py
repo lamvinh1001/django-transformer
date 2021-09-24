@@ -47,7 +47,6 @@ class TranslateView(View):
         print(predict(data, w2i, transformer))
         try:
             pred = predict(data, w2i, transformer)
-            print(pred)
         except:
             return HttpResponse(json.dumps({'data': '...'}), content_type="application/json")
 
