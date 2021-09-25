@@ -43,15 +43,17 @@ class TranslateView(View):
 
     def post(self, request):
         data = request.POST['value']
+        # print(data)
         data = preprocess(data)
-        print(predict(data, w2i, transformer))
+        # print(d)
+        # print(predict(data, w2i, transformer))
         try:
             pred = predict(data, w2i, transformer)
         except:
             return HttpResponse(json.dumps({'data': '...'}), content_type="application/json")
 
         result = decode(i2w, [i for i in pred.numpy()[0]])
-        print(result)
+        # print(result)
         while '_' in result:
             result = result.replace('_', ' ')
         return HttpResponse(json.dumps({'data': result}), content_type="application/json")
