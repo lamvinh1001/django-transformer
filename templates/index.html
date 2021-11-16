@@ -11,7 +11,9 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/popper.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-    <script src="{% static 'js/index.js' %}"></script>
+    <!-- <script src="{% static 'js/index1.js' %}"></script> -->
+    <!-- <script src="{% static 'js/index1.js' %}"></script> -->
+
 </head>
 
 <body>
@@ -82,6 +84,78 @@
         </div>
     </div>
     <script>
+        $(document).ready(function () {
+            let height = $("textarea").height();
+            $("textarea").on("keyup keypress", function () {
+                $("textarea").height(height);
+                $("textarea").height(this.scrollHeight);
+            });
+
+            $(".item button").click(function () {
+                $(".item button").removeClass("activate");
+                $(this).addClass("activate");
+                let index = $(this).index();
+                $(".trans").removeClass("activate");
+                $($(".trans")[index]).addClass("activate");
+            });
+
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    const cookies = document.cookie.split(";");
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === name + "=") {
+                            cookieValue = decodeURIComponent(
+                                cookie.substring(name.length + 1)
+                            );
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            };
+            $('textarea').keyup(function () {
+                var characterCount = $(this).val().length,
+                    current_count = $('#current_count'),
+                    maximum_count = $('#maximum_count'),
+                    count = $('#count');
+                current_count.text(characterCount);
+            });
+            $("#english").on("input propertychange paste", function () {
+                let value = $(this).val();
+                $("#vietnam").val("...");
+                if (value.trim() != "") {
+                    $.ajax({
+                        type: "POST",
+                        url: "",
+                        data: {
+                            value: value,
+                            csrfmiddlewaretoken: getCookie("csrftoken"),
+                        },
+                        success: function (response) {
+                            $("#vietnam").val(response["data"]);
+                        },
+                    });
+                } else {
+                    $("#vietnam").val("Bản dịch");
+                }
+            });
+            $("#volume").click(function () {
+                let val = $("#vietnam").val();
+                // var msg = new SpeechSynthesisUtterance();
+                // window.speechSynthesis.speak(msg);
+                var msg = new SpeechSynthesisUtterance();
+                msg.text = val;
+
+                msg.lang = "vi-VN";
+                speechSynthesis.speak(msg);
+
+            });
+
+        });
         function record() {
             var recognition = new webkitSpeechRecognition();
             recognition.lang = "en-GB";
@@ -95,6 +169,8 @@
             recognition.start();
 
         }
+
+
     </script>
 </body>
 
