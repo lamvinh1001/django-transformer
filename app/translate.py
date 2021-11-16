@@ -322,10 +322,12 @@ def create_masks(inp, tar):
 
 def encode_en(w2i, text):
     return [1]+[w2i[i] for i in text.split()]+[2]
+    # return [1] + [w2i.get(i) if w2i.get(i) != None else i for i in text.split()]
 
 
 def predict(text, w2i, transformer):
     maxlen = 63
+    text = preprocess(text)
     encode = [encode_en(w2i, text)]
     encoder_input = pad_sequences(encode, maxlen=maxlen, padding='post')
     output = tf.convert_to_tensor([1], dtype=tf.int64)
@@ -353,8 +355,62 @@ def decode(i2w, ids):
     return ' '.join(i2w[i] for i in ids[start:end])
 
 
+def evaluate(text, w2i, i2w, transformer):
+    text = preprocess(text)
+    results = ''
+    index = 0
+    for x in text.split():
+
+        if x not in w2i.keys() and x != ',':
+            child = []
+            for y in text[index:text.index(x, index)].split(' , '):
+                child.append(predict(y, w2i, i2w, transformer))
+            results += ', '.join(child)+' ' + x + ' '
+
+            index = text.index(x, index) + len(x)
+            print(index)
+        elif x in w2i.keys() and x == text.split()[-1]:
+
+            child = []
+            for y in text[index:].split(' , '):
+                child.append(predict(y, w2i, i2w, transformer))
+            results += ', '.join(child)
+    return results
+
+
+def predict(text, w2i, i2w, transformer):
+    maxlen = 63
+    encode = [encode_en(w2i, text)]
+    encoder_input = pad_sequences(encode, maxlen=maxlen, padding='post')
+    output = tf.convert_to_tensor([1], dtype=tf.int64)
+    output = tf.expand_dims(output, 0)
+    for _ in range(maxlen):
+        enc_padding_mask, combined_mask, dec_padding_mask = create_masks(
+            encoder_input, output)
+        predictions, _ = transformer(encoder_input,
+                                     output,
+                                     False,
+                                     enc_padding_mask,
+                                     combined_mask,
+                                     dec_padding_mask)
+        predictions = predictions[:, -1:, :]
+        predicted_id = tf.argmax(predictions, axis=-1)
+        output = tf.concat([output, predicted_id], axis=-1)
+        if predicted_id == 2:
+            return decode(i2w, [i for i in output.numpy()[0]]).replace('_', ' ')
+    return decode(i2w, [i for i in output.numpy()[0]]).replace('_', ' ')
+
+
+def decode(i2w, ids):
+    start = 0 if ids[0] != 1 else 1
+    end = ids.index(2) if 2 in ids else None
+    return ' '.join(i2w[i] for i in ids[start:end])
+    # return ' '.join(i2w.get(i) if i2w.get(i) != None else i for i in ids[start:end])
+
+
 def preprocess(text):
     pun = string.punctuation
-    pun = pun.replace("'", '')
+    # pun = pun.remove(',')
+    pun = pun.replace(",", '')
     text = ''.join([i for i in text if i not in pun])
     return text.lower()

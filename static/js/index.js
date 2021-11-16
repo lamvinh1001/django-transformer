@@ -59,8 +59,13 @@ $(document).ready(function () {
     });
     $("#volume").click(function () {
         let val = $("#english").val();
-        var msg = new SpeechSynthesisUtterance();
+        // var msg = new SpeechSynthesisUtterance();
         msg.text = val;
-        window.speechSynthesis.speak(msg);
+        // window.speechSynthesis.speak(msg);
+        var msg = new SpeechSynthesisUtterance();
+        msg.lang = "vi-VN";
+        msg.text = val
+        speechSynthesis.speak(msg);
+
     });
 });
