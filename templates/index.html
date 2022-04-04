@@ -50,8 +50,6 @@
                         <div class="media">
                             <img src="{% static 'img/microphone.png' %}" alt="" id="micro" onclick="record()" />
 
-                            <img src="{% static 'img/volume.png' %}" alt="" id="volume" />
-
                         </div>
                         <div id="count">
                             <span id="current_count">0</span>
@@ -69,6 +67,11 @@
                         <textarea name="" id="vietnam" disabled>
                             Bản dịch</textarea>
                     </div>
+
+                    <div class="media">
+                        <img src="{% static 'img/volume.png' %}" alt="" id="volume" />
+                    </div>
+
                 </div>
             </div>
 
@@ -158,6 +161,7 @@
         });
         function record() {
             var recognition = new webkitSpeechRecognition();
+            recognition.continuous = true
             recognition.lang = "en-GB";
 
             recognition.onresult = function (event) {

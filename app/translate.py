@@ -3,6 +3,7 @@ import numpy as np
 import pickle
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import string
+import regex as re
 
 with open('app/models/embedding_en.pkl', 'rb') as f:
     embedding_en = pickle.load(f)
@@ -356,7 +357,7 @@ def decode(i2w, ids):
 
 
 def evaluate(text, w2i, i2w, transformer):
-    text = preprocess(text)
+    text = text_cleaner(text)
     results = ''
     index = 0
     for x in text.split():
@@ -408,9 +409,13 @@ def decode(i2w, ids):
     # return ' '.join(i2w.get(i) if i2w.get(i) != None else i for i in ids[start:end])
 
 
-def preprocess(text):
-    pun = string.punctuation
-    # pun = pun.remove(',')
-    pun = pun.replace(",", '')
-    text = ''.join([i for i in text if i not in pun])
-    return text.lower()
+def text_cleaner(text):
+    newString = text.lower()
+    newString = re.sub(r'\([^)]*\)', '', newString)
+    newString = re.sub('"', '', newString)
+    newString = re.sub(r"'s\b", "", newString)
+    newString = re.sub("[^a-zA-Z|^,|^0-9|^'s]", " ", newString)
+    newString = newString.replace(', ', ' , ')
+    newString = re.sub('[m]{2,}', 'mm', newString)
+    tokens = newString.split()
+    return (" ".join(tokens)).strip()
